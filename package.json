@@ -9,7 +9,8 @@
   "scripts": {
     "start": "nodemon index.js",
     "client": "cd client && npm start",
-    "dev": "concurrently \"npm run start\" \"npm run client\""
+    "dev": "concurrently \"npm run start\" \"npm run client\"",
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "author": "Rokas Kasperavicius",
   "license": "ISC",
