@@ -2,6 +2,9 @@
   "name": "timelogging-server",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "14.15.1"
+  },
   "description": "timelogging-server",
   "scripts": {
     "start": "nodemon index.js",
