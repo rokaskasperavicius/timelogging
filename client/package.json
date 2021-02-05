@@ -54,7 +54,5 @@
   },
   "author": "Rokas Kasperavicius",
   "license": "ISC",
-  "devDependencies": {
-    "@hookform/devtools": "^2.2.1"
-  }
+  "devDependencies": {}
 }

@@ -31,7 +31,6 @@ import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import { useForm, Controller, FormProvider } from "react-hook-form";
-import { DevTool } from "@hookform/devtools";
 
 import { Stepper } from 'components'
 import { Dropdown, Input } from 'semantic-ui-react'
