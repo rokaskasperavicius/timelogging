@@ -4,8 +4,8 @@ import './App.css'
 import {
   useQuery,
   useQueryClient,
-  useMutation,
   useInfiniteQuery,
+  InfiniteQueryObserver,
 } from 'react-query'
 
 import {
@@ -44,7 +44,7 @@ import queryString from 'query-string'
 
 import { DateTimeField, DateField, DropdownField, InputField, CheckboxField } from 'fields'
 
-import { groupBy, map, chain, sortBy, upperFirst, concat } from 'lodash'
+import { groupBy, map, chain, sortBy, upperFirst, concat, forEach } from 'lodash'
 
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
@@ -60,8 +60,11 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableContainer from '@material-ui/core/TableContainer'
 import Tooltip from '@material-ui/core/Tooltip'
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Zoom from '@material-ui/core/Zoom'
 import { YearSelection } from '@material-ui/pickers/views/Year/YearView';
+
+import { useFetch, usePaginator, useMutation } from 'hooks'
 
 const options = [
   { key: 'English', text: 'English', value: 'English' },
@@ -95,11 +98,11 @@ const App = () => {
   const classes = useStyles();
   const queryClient = useQueryClient()
 
+  const [page, setPage] = useState(0)
+
   const history = useHistory()
 
   const { year = new Date().getFullYear(), month = format(new Date(), 'MMMM') } = queryString.parse(useLocation().search)
-
-  const [pageCount, setPageCount] = useState(null)
 
   // const { data: sortedCalendar, isLoading, isSuccess } = useQuery(['calendar', year, month], async () => {
   //   const res = await fetch(`/api/calendar?year=${year}&month=${month}&page=${1}`)
@@ -107,14 +110,37 @@ const App = () => {
   //   return data
   // })
 
-  const data = useInfiniteQuery(['test', year, month], async ({ pageParam = 0 }) => {
-    const res = await fetch(`/api/calendar?year=${year}&month=${month}&page=${pageParam}`)
-    const data = await res.json()
-    setPageCount(data.pages)
-    return data.data
-  }, {
-    getNextPageParam: (lastPage, pages) => pages.length >= pageCount ? undefined : pages.length,
-  })
+  // const data = useQuery(['test', year, month], null)
+
+  // const a = useFetch(`/api/calendarr?year=${year}&month=${month}&page=${0}`)
+  const [pages, pageCount, isLoading, clearPages, fetchUrl] = usePaginator(`/api/calendar?year=${year}&month=${month}&page=${page}`)
+
+  const calendar = useMemo(() => pages && groupBy(concat(...Object.values(pages)), (values) =>
+    format(new Date(values.startDate), 'yyyy MMMM dd')),
+    [pages])
+
+  // fetch(`/api/calendarr?year=${year}&month=${month}&page=${0}`)
+  //   .then(data => data.json())
+  //   .then(res => console.log({ res }))
+  //   .catch(err => console.log(err))
+
+  // , async ({ pageParam = 0 }) => {
+  //   console.log(pageParam)
+  //   const res = await fetch(`/api/calendar?year=${year}&month=${month}&page=${pageParam}`)
+  //   const data = await res.json()
+  //   setPageCount(data.pages)
+  //   // return data.data
+
+  //   queryClient.setQueryData(['test', year, month], 'test')
+  // }, {
+  //   // getNextPageParam: (lastPage, pages) => pages.length >= pageCount ? undefined : pages.length,
+  //   getNextPageParam: undefined,
+  // }
+
+  // useEffect(() => {
+  //   data.refetch()
+  // }, [year, month])
+  // console.log(data)
 
   // groupBy(sortBy(data, 'startDate'), (values) =>
   //   format(new Date(values.startDate), 'yyyy MMMM dd'))
@@ -143,15 +169,30 @@ const App = () => {
     },
   })
 
-  const { data: tasks, refetch: refreshTasks } = useQuery('tasks', async () => {
-    const { data } = await axios('/api/tasks')
+  const data = []
 
-    return data
-  })
+  // const { data: tasks, refetch: refreshTasks } = useQuery('tasks', async () => {
+  //   const { data } = await axios('/api/tasks')
+
+  //   return data
+  // })
 
   const { register, handleSubmit, watch, errors, control, reset, getValues, formState, setValue } = methods
-  const onSubmit = data => {
-    mutation.mutate({
+
+  const [sendData, load] = useMutation('/api/calendar', 'The time has been added', {
+    onSuccess: ({ year: logYear, month: logMonth }) => {
+      if (logYear !== year || logMonth !== month) {
+        history.push(`/calendar?year=${logYear}&month=${logMonth}`)
+      } else {
+        window.location.reload() // this is not okay
+        // fetchUrl(`/api/calendar?year=${year}&month=${month}&page=${0}`)
+      }
+    }
+  })
+  console.log({ load })
+
+  const onSubmit = (data) => {
+    sendData({
       ...data,
       year: format(data.logDate, 'y'),
       month: format(data.logDate, 'LLLL'),
@@ -159,20 +200,20 @@ const App = () => {
     })
   }
 
-  const mutation = useMutation(data => {
-    return axios({
-      method: 'post',
-      url: '/api/calendar',
-      data,
-    });
-  }, {
-    onSuccess: (data, { year, month }) => {
-      queryClient.setQueryData(['calendar', year, month], groupBy(sortBy(data.data, 'startDate'), (values) =>
-      format(new Date(values.startDate), 'yyyy MMMM dd')))
-      refreshTasks()
-      history.push(`/calendar?year=${year}&month=${month}`)
-    },
-  })
+  // const mutation = useMutation(data => {
+  //   return axios({
+  //     method: 'post',
+  //     url: '/api/calendar',
+  //     data,
+  //   });
+  // }, {
+  //   onSuccess: (data, { year, month }) => {
+  //     queryClient.setQueryData(['calendar', year, month], groupBy(sortBy(data.data, 'startDate'), (values) =>
+  //     format(new Date(values.startDate), 'yyyy MMMM dd')))
+  //     refreshTasks()
+  //     history.push(`/calendar?year=${year}&month=${month}`)
+  //   },
+  // })
 
   const handleDateChange = () => {
     const startDate = getValues('startDate')
@@ -192,40 +233,29 @@ const App = () => {
     }
   }
 
-  const { ref, inView, entry } = useInView({
-    /* Optional options */
+  const { ref, inView } = useInView({
     root: document.getElementById('test'),
-    rootMargin: '0px 0px 300px 0px',
+    rootMargin: '0px 0px 0px 0px',
     initialInView: false,
   });
 
-  const fetchNextPage = data.fetchNextPage
-
   useEffect(() => {
-    console.log(inView)
-    if (inView && fetchNextPage) {
-      fetchNextPage()
+    if (inView && !isLoading) {
+      setPage(p => p + 1) // fix this
     }
-  }, [inView, fetchNextPage])
-
-  const inputEl = useRef(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView])
 
   const addMonth = (monthCount) => {
+    setPage(0)
+    clearPages()
+
     const newDate = add(new Date(`${year} ${month}`), { months: monthCount })
     history.push(`/calendar?year=${newDate.getFullYear()}&month=${format(newDate, 'MMMM')}`)
   }
 
   const logDate = watch('logDate')
 
-
-  let sortedCalendar = undefined
-
-  if (data && data.data && data.data.pages) {
-    sortedCalendar = groupBy(concat(...data.data.pages), (values) =>
-      format(new Date(values.startDate), 'yyyy MMMM dd'))
-  }
-
-  console.log(pageCount)
   return (
     <div className="App">
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -257,44 +287,63 @@ const App = () => {
                 <TableCell style={{ borderBottomColor: '#303030' }} colSpan={2} size='medium' align='center'>Actions</TableCell>
               </TableRow>
             </TableHead>
-            <>
-              {!data.isLoading && data.isSuccess && map(sortedCalendar, (dates, logDate) => (
-                <>
-                  <TableHead>
+            {map(calendar, (dates, logDate) => (
+              <React.Fragment>
+                <TableHead>
+                  <TableRow>
+                    <TableCell colSpan={7} style={{ top: '54px' }} size='medium'>{logDate}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {dates.map((values, index) => (
                     <TableRow>
-                      <TableCell colSpan={7} style={{ top: '54px' }} size='medium'>{logDate}</TableCell>
+                      <TableCell>{values.task}</TableCell>
+                      <TableCell>{differenceInHours(new Date(values.endDate), new Date(values.startDate))}h {differenceInMinutes(new Date(values.endDate), new Date(values.startDate)) - (60 * differenceInHours(new Date(values.endDate), new Date(values.startDate)))}m</TableCell>
+                      <TableCell>{`(${format(new Date(values.startDate), 'HH.mm')}`} &ndash; {format(new Date(values.endDate), 'HH.mm')})</TableCell>
+                      <TableCell style={{ maxWidth: '100px' }}>{values.description}</TableCell>
+                      <TableCell>{values.isLogged ? 'Logged' : 'Not logged'}</TableCell>
+                      <TableCell style={{ width: '10px' }}>
+                        <Tooltip classes={{ tooltip: classes.tooltip }} title='Edit' placement="top" TransitionComponent={Zoom} arrow>
+                          <IconButton color='primary'>
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell style={{ width: '10px' }}>
+                        <Tooltip classes={{ tooltip: classes.tooltip }} title='Delete' placement="top" TransitionComponent={Zoom} arrow>
+                          <IconButton color='secondary'>
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {dates.map((values, index) => (
-                      <TableRow>
-                        <TableCell>{values.task}</TableCell>
-                        <TableCell>{differenceInHours(new Date(values.endDate), new Date(values.startDate))}h {differenceInMinutes(new Date(values.endDate), new Date(values.startDate)) - (60 * differenceInHours(new Date(values.endDate), new Date(values.startDate)))}m</TableCell>
-                        <TableCell>{`(${format(new Date(values.startDate), 'HH.mm')}`} &ndash; {format(new Date(values.endDate), 'HH.mm')})</TableCell>
-                        <TableCell style={{ maxWidth: '100px' }}>{values.description}</TableCell>
-                        <TableCell>{values.isLogged ? 'Logged' : 'Not logged'}</TableCell>
-                        <TableCell style={{ width: '10px' }}>
-                          <Tooltip classes={{ tooltip: classes.tooltip }} title='Edit' placement="top" TransitionComponent={Zoom} arrow>
-                            <IconButton color='primary'>
-                              <EditIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell style={{ width: '10px' }}>
-                          <Tooltip classes={{ tooltip: classes.tooltip }} title='Delete' placement="top" TransitionComponent={Zoom} arrow>
-                            <IconButton color='secondary'>
-                              <DeleteIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </>
-              ))}
-            </>
+                  ))}
+                </TableBody>
+              </React.Fragment>
+            ))}
           </Table>
-          {!data.isLoading && data.isSuccess && data.hasNextPage && <div style={{ color: 'white' }} ref={ref}>Loading...</div>}
+          {!isLoading && pageCount === 0 && (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '80px',
+              color: 'white',
+              fontSize: '15px'
+            }}>No times to render</div>
+          )}
+
+
+          {(page + 1 < pageCount || isLoading) && (
+            <div ref={ref} style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '80px',
+            }}>
+              <CircularProgress />
+            </div>
+          )}
         </TableContainer>
       </div>
 
@@ -306,7 +355,7 @@ const App = () => {
         BackdropComponent={Backdrop}
       >
         <Fade in={open}>
-          <div className={classes.paper}>
+          <div className={classes.paper}> 
             <FormProvider {...methods} >
               <form onSubmit={handleSubmit(onSubmit)}>
                 <DateTimeField
@@ -335,7 +384,7 @@ const App = () => {
                 />
                 <DropdownField
                   name='task'
-                  options={tasks}
+                  options={[]}
                   rules={{
                     required: true,
                   }}

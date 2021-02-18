@@ -20,8 +20,10 @@ app.get('/calendar', async (req, res) => {
     if (err) throw err;
 
     client.release();
+
     res.json({
-      data: result[0].rows,
+      calendar: result[0].rows,
+      page: Number(page),
       pages: Math.ceil(result[1].rows[0].count / 20),
     })
   });
@@ -46,9 +48,7 @@ app.post('/calendar', async (req, res) => {
   console.log(createdAt)
   const client = await pool.connect();
 
-  const getQuery = `SELECT task, start_date as "startDate", end_date as "endDate", description, is_logged as "isLogged", month, year FROM calendar WHERE year = '${year}' AND month = '${month}';`
-
-  client.query(`INSERT INTO calendar(task, start_date, end_date, description, month, year, is_logged, created_at) values('${task}', '${startDate}', '${endDate}', '${description}', '${month}', '${year}', ${isLogged}, '${createdAt}'); ${getQuery}`, (err, result) => {
+  client.query(`INSERT INTO calendar(task, start_date, end_date, description, month, year, is_logged, created_at) values('${task}', '${startDate}', '${endDate}', '${description}', '${month}', '${year}', ${isLogged}, '${createdAt}')`, (err, result) => {
     if (err) throw err;
 
     client.release();

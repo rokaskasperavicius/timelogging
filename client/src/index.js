@@ -13,6 +13,8 @@ import cyan from "@material-ui/core/colors/cyan";
 import { createMuiTheme } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
 
+import { SnackbarProvider } from 'notistack';
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -46,33 +48,44 @@ const darkTheme = createMuiTheme({
 ReactDOM.render(
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={darkTheme}>
-        <Router>
-          <div>
-            {/* <nav>
-              <ul>
-                <li>
-                  <Link to="/?year=2021&month=February">February</Link>
-                </li>
-                <li>
-                  <Link to="/?year=2021&month=March">March</Link>
-                </li>
-                <li>
-                  <Link to="/users">Users</Link>
-                </li>
-              </ul>
-            </nav> */}
-            <Switch>
-              <Route path="/calendar">       
-                <App />
-              </Route>
-              <Redirect
-                to={{
-                  pathname: "/calendar",
-                }}
-              />
-            </Switch>
-          </div>
-        </Router>
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+        >
+          <Router>
+            <div>
+              <nav>
+                <ul>
+                  <li>
+                    <Link to="/?year=2021&month=February">February</Link>
+                  </li>
+                  <li>
+                    <Link to="calendar">March</Link>
+                  </li>
+                  <li>
+                    <Link to="/users">Users</Link>
+                  </li>
+                </ul>
+              </nav>
+              <Switch>
+                <Route path="/calendar">       
+                  <App />
+                </Route>
+                <Route path="/users">       
+                  <div>HI</div>
+                </Route>
+                <Redirect
+                  to={{
+                    pathname: "/calendar",
+                  }}
+                />
+              </Switch>
+            </div>
+          </Router>
+        </SnackbarProvider>
       </ThemeProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
