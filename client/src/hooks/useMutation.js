@@ -29,7 +29,9 @@ const useMutation = (url, message, actions) => {
 
       actions.onSuccess(data)
     } else {
-      renderError(result.error)
+      if (result) {
+        renderError(result.error)
+      }
     }
 
     setIsLoading(false)

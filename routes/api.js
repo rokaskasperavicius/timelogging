@@ -21,11 +21,11 @@ app.get('/calendar', async (req, res) => {
 
     client.release();
 
-    res.json({
-      calendar: result[0].rows,
-      page: Number(page),
-      pages: Math.ceil(result[1].rows[0].count / 20),
-    })
+    // res.json({
+    //   calendar: result[0].rows,
+    //   page: Number(page),
+    //   pages: Math.ceil(result[1].rows[0].count / 20),
+    // })
   });
 })
 
@@ -52,7 +52,7 @@ app.post('/calendar', async (req, res) => {
     if (err) throw err;
 
     client.release();
-    res.json(result[1].rows)
+    res.json({ message: 'Success' })
   });
 })
 

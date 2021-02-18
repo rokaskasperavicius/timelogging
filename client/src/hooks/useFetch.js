@@ -23,7 +23,9 @@ const useFetch = (baseUrl) => {
     if (response.status === 200) {
       setData(result)
     } else {
-      renderError(result.error)
+      if (result) {
+        renderError(result.error)
+      }
     }
 
     setIsLoading(false)

@@ -184,7 +184,7 @@ const App = () => {
       if (logYear !== year || logMonth !== month) {
         history.push(`/calendar?year=${logYear}&month=${logMonth}`)
       } else {
-        window.location.reload() // this is not okay
+        // window.location.reload() // this is not okay
         // fetchUrl(`/api/calendar?year=${year}&month=${month}&page=${0}`)
       }
     }
