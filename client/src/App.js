@@ -1,78 +1,52 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
-import logo from './logo.svg'
-import './App.css'
-import {
-  useQuery,
-  useQueryClient,
-  useInfiniteQuery,
-  InfiniteQueryObserver,
-} from 'react-query'
+import React, { useState, useEffect, useMemo } from 'react'
+
+import { useLocation, useHistory } from 'react-router-dom'
+
+// material-ui
+import AddIcon from '@material-ui/icons/Add'
+import { useForm, FormProvider } from 'react-hook-form'
 
 import {
-  useLocation,
-  useHistory,
-} from "react-router-dom";
+  Drawer,
+  Button,
+  Modal,
+  Backdrop,
+  IconButton,
+  Fade,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableContainer,
+  Tooltip,
+  CircularProgress,
+  Zoom,
+  makeStyles,
+} from '@material-ui/core'
 
-
-import formatISO from 'date-fns/formatISO'
-
-import {DatePicker,
-  TimePicker,
-  DateTimePicker, } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
-import blue from "@material-ui/core/colors/blue";
-import cyan from "@material-ui/core/colors/cyan";
-import { createMuiTheme } from "@material-ui/core";
-import { ThemeProvider } from "@material-ui/styles";
-import AddIcon from '@material-ui/icons/Add';
-import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core';
-import Modal from '@material-ui/core/Modal';
-import Backdrop from '@material-ui/core/Backdrop';
-import Fade from '@material-ui/core/Fade';
-import { useForm, Controller, FormProvider } from "react-hook-form";
-
-import { Stepper } from 'components'
-import { Dropdown, Input } from 'semantic-ui-react'
-import { Select, Ref } from 'semantic-ui-react'
-import axios from 'axios'
 import { format, add, differenceInHours, differenceInMinutes } from 'date-fns'
 
-import { useInView } from 'react-intersection-observer';
+import { useInView } from 'react-intersection-observer'
 
 import queryString from 'query-string'
 
 import { DateTimeField, DateField, DropdownField, InputField, CheckboxField } from 'fields'
 
-import { groupBy, map, chain, sortBy, upperFirst, concat, forEach } from 'lodash'
-
-import IconButton from '@material-ui/core/IconButton'
+import { groupBy, map, upperFirst, concat } from 'lodash'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-
-import Table from '@material-ui/core/Table'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
-import TableContainer from '@material-ui/core/TableContainer'
-import Tooltip from '@material-ui/core/Tooltip'
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Zoom from '@material-ui/core/Zoom'
-import { YearSelection } from '@material-ui/pickers/views/Year/YearView';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
 
 import { useFetch, usePaginator, useMutation } from 'hooks'
 
-const options = [
-  { key: 'English', text: 'English', value: 'English' },
-  { key: 'French', text: 'French', value: 'French' },
-  { key: 'Spanish', text: 'Spanish', value: 'Spanish' },
-  { key: 'German', text: 'German', value: 'German' },
-  { key: 'Chinese', text: 'Chinese', value: 'Chinese' },
-]
+import { LogTimeForm } from 'forms'
+
+import { useModalContext } from 'context'
+import './App.css'
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -95,187 +69,108 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const App = () => {
-  const classes = useStyles();
-  const queryClient = useQueryClient()
-
-  const [page, setPage] = useState(0)
-
+  const classes = useStyles()
   const history = useHistory()
+
+  const { setModalProps } = useModalContext()
 
   const { year = new Date().getFullYear(), month = format(new Date(), 'MMMM') } = queryString.parse(useLocation().search)
 
-  // const { data: sortedCalendar, isLoading, isSuccess } = useQuery(['calendar', year, month], async () => {
-  //   const res = await fetch(`/api/calendar?year=${year}&month=${month}&page=${1}`)
-  //   const data = await res.json()
-  //   return data
-  // })
-
-  // const data = useQuery(['test', year, month], null)
-
-  // const a = useFetch(`/api/calendarr?year=${year}&month=${month}&page=${0}`)
-  const [pages, pageCount, isLoading, clearPages, fetchUrl] = usePaginator(`/api/calendar?year=${year}&month=${month}&page=${page}`)
+  const [
+    pages,
+    { page, setPage, pageCount },
+    isLoading,
+    resetPaginator,
+    fetchCalendar,
+  ] = usePaginator(`/api/calendar?year=${year}&month=${month}`)
 
   const calendar = useMemo(() => pages && groupBy(concat(...Object.values(pages)), (values) =>
     format(new Date(values.startDate), 'yyyy MMMM dd')),
     [pages])
 
-  // fetch(`/api/calendarr?year=${year}&month=${month}&page=${0}`)
-  //   .then(data => data.json())
-  //   .then(res => console.log({ res }))
-  //   .catch(err => console.log(err))
+  const [{ minutes }] = useFetch(`/api/hours?year=${year}&month=${month}`)
 
-  // , async ({ pageParam = 0 }) => {
-  //   console.log(pageParam)
-  //   const res = await fetch(`/api/calendar?year=${year}&month=${month}&page=${pageParam}`)
-  //   const data = await res.json()
-  //   setPageCount(data.pages)
-  //   // return data.data
-
-  //   queryClient.setQueryData(['test', year, month], 'test')
-  // }, {
-  //   // getNextPageParam: (lastPage, pages) => pages.length >= pageCount ? undefined : pages.length,
-  //   getNextPageParam: undefined,
-  // }
-
-  // useEffect(() => {
-  //   data.refetch()
-  // }, [year, month])
-  // console.log(data)
-
-  // groupBy(sortBy(data, 'startDate'), (values) =>
-  //   format(new Date(values.startDate), 'yyyy MMMM dd'))
-
-  // const sortedCalendar = useMemo(() =>
-  //   groupBy(sortBy(data, 'startDate'), (values) =>
-  //     format(new Date(values.startDate), 'yyyy MMMM dd'))
-  // , [data])
   const [open, setOpen] = React.useState(false)
 
   const handleOpen = () => {
-    setOpen(true);
+    setModalProps({
+      component: <LogTimeForm />,
+      props: {
+        year,
+        month,
+        resetPaginator,
+        fetchCalendar,
+        history,
+      },
+    })
   };
 
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const methods = useForm({
-    defaultValues: {
-      startDate: null,
-      endDate: null,
-      logDate: null,
-      task: null,
-      isLogged: false,
-    },
-  })
-
-  const data = []
-
-  // const { data: tasks, refetch: refreshTasks } = useQuery('tasks', async () => {
-  //   const { data } = await axios('/api/tasks')
-
-  //   return data
-  // })
-
-  const { register, handleSubmit, watch, errors, control, reset, getValues, formState, setValue } = methods
-
-  const [sendData, load] = useMutation('/api/calendar', 'The time has been added', {
-    onSuccess: ({ year: logYear, month: logMonth }) => {
-      if (logYear !== year || logMonth !== month) {
-        history.push(`/calendar?year=${logYear}&month=${logMonth}`)
-      } else {
-        window.location.reload() // this is not okay
-        // fetchUrl(`/api/calendar?year=${year}&month=${month}&page=${0}`)
-      }
-    }
-  })
-  console.log({ load })
-
-  const onSubmit = (data) => {
-    sendData({
-      ...data,
-      year: format(data.logDate, 'y'),
-      month: format(data.logDate, 'LLLL'),
-      createdAt: new Date(),
-    })
   }
 
-  // const mutation = useMutation(data => {
-  //   return axios({
-  //     method: 'post',
-  //     url: '/api/calendar',
-  //     data,
-  //   });
-  // }, {
-  //   onSuccess: (data, { year, month }) => {
-  //     queryClient.setQueryData(['calendar', year, month], groupBy(sortBy(data.data, 'startDate'), (values) =>
-  //     format(new Date(values.startDate), 'yyyy MMMM dd')))
-  //     refreshTasks()
-  //     history.push(`/calendar?year=${year}&month=${month}`)
-  //   },
-  // })
-
-  const handleDateChange = () => {
-    const startDate = getValues('startDate')
-    const endDate = getValues('endDate')
-
-    if (startDate && endDate) {
-      const year = startDate.getFullYear()
-      let month = startDate.getMonth()
-      const date = startDate.getDate()
-      
-      if (date >= 20) {
-        month++
-      }
-      console.log(new Date(year, month))
-      setValue('logDate', new Date(year, month))
-      console.log(getValues('logDate'))
-    }
-  }
+  const [test, setTest] = useState(true)
 
   const { ref, inView } = useInView({
     root: document.getElementById('test'),
     rootMargin: '0px 0px 0px 0px',
     initialInView: false,
+    triggerOnce: test,
   });
 
+  const [testt, setTestt] = useState(true)
+
   useEffect(() => {
-    if (inView && !isLoading) {
-      setPage(p => p + 1) // fix this
-    }
+    // if (inView && !isLoading) {
+    //   setPage(p => p + 1) // fix this
+    // }
+    console.log({ inView })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView])
 
   const addMonth = (monthCount) => {
-    setPage(0)
-    clearPages()
+    resetPaginator()
 
     const newDate = add(new Date(`${year} ${month}`), { months: monthCount })
     history.push(`/calendar?year=${newDate.getFullYear()}&month=${format(newDate, 'MMMM')}`)
   }
 
-  const logDate = watch('logDate')
+  const [drawerOpen, setDrawer] = useState(false)
+
+  const handleDrawerState = (state) => {
+    setDrawer(state)
+  }
 
   return (
     <div className="App">
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleOpen}
-        >
-          log time
-        </Button>
+        <div>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleOpen}
+          >
+            log time
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={() => handleDrawerState(true)}
+          >
+            info
+          </Button>
+        </div>
         <div style={{ color: 'white', display: 'flex', alignItems: 'center' }}>
           <Button variant='outlined' color="primary" onClick={() => addMonth(-1)}><ArrowBackIcon /></Button>
           <span>&nbsp;&nbsp;{year}</span>
-          <span style={{ width: '71px', textAlign: 'center' }}>{upperFirst(month.toLowerCase())}&nbsp;</span>
+          <span style={{ width: '82px', textAlign: 'center' }}>{upperFirst(month.toLowerCase())}&nbsp;</span>
           <Button variant='outlined' color="primary" onClick={() => addMonth(1)}><ArrowForwardIcon /></Button>
         </div>
       </div>
       <div style={{ marginTop: '20px' }}>
-        <TableContainer id='test' style={{ maxHeight: '90vh' }}>
+        {/* <TableContainer component={Paper} style={{ maxHeight: '90vh', overflowY: 'overlay' }}> */}
           <Table stickyHeader size='small'>
             <TableHead>
               <TableRow>
@@ -291,7 +186,7 @@ const App = () => {
               <React.Fragment>
                 <TableHead>
                   <TableRow>
-                    <TableCell colSpan={7} style={{ top: '54px' }} size='medium'>{logDate}</TableCell>
+                    <TableCell colSpan={7} style={{ top: '51px' }} size='medium'>{logDate}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -322,7 +217,7 @@ const App = () => {
               </React.Fragment>
             ))}
           </Table>
-          {!isLoading && pageCount === 0 && (
+          {/* {!isLoading && pageCount === 0 && (
             <div style={{
               display: 'flex',
               justifyContent: 'center',
@@ -331,7 +226,7 @@ const App = () => {
               color: 'white',
               fontSize: '15px'
             }}>No times to render</div>
-          )}
+          )} */}
 
 
           {(page + 1 < pageCount || isLoading) && (
@@ -344,82 +239,16 @@ const App = () => {
               <CircularProgress />
             </div>
           )}
-        </TableContainer>
+        {/* </TableContainer> */}
       </div>
-
-      <Modal
-        open={open}
-        className={classes.modal}
-        onClose={handleClose}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-      >
-        <Fade in={open}>
-          <div className={classes.paper}> 
-            <FormProvider {...methods} >
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <DateTimeField
-                  name='startDate'
-                  onChange={handleDateChange}
-                  rules={{
-                    required: true,
-                    validate: value => value < getValues('endDate')
-                  }}
-                />
-                <DateTimeField
-                  name='endDate'
-                  onChange={handleDateChange}
-                  rules={{
-                    required: true,
-                    validate: value => value > getValues('startDate')
-                  }}
-                />
-                <DateField
-                  style={{ display: logDate ? 'unset' : 'none' }}
-                  name='logDate'
-                  views={['year', 'month']}
-                  rules={{
-                    required: true,
-                  }}
-                />
-                <DropdownField
-                  name='task'
-                  options={[]}
-                  rules={{
-                    required: true,
-                  }}
-                />
-                <InputField
-                  name='description'
-                  multiline={true}
-                  rules={{
-                    required: true,
-                  }}
-                />
-                <CheckboxField
-                  name='isLogged'
-                />
-                {/* <button
-                  type="button"
-                  onClick={() => reset({
-                    startDate: null,
-                    endDate: null,
-                  })}
-                >
-                  Reset Form
-                </button> */}
-                <Button
-                  type={'submit'}
-                  variant="contained"
-                  color="primary"
-                >
-                  Submit
-                </Button>
-              </form>
-            </FormProvider>
+      <Drawer anchor='bottom' open={drawerOpen} onClose={() => handleDrawerState(false)}>
+        {minutes && (
+          <div style={{ height: '100px' }}>
+            <div>In total: {Math.floor(minutes.minutesTotal / 60)}h {minutes.minutesTotal % 60}m</div>
+            <div>Zenegy: {minutes.minutesZenegy / 60}h {minutes.minutesZenegy % 60}m</div>
           </div>
-        </Fade>
-      </Modal>
+        )}
+      </Drawer>
     </div>
   );
 }

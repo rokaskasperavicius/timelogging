@@ -6,7 +6,7 @@ const useFetch = (baseUrl) => {
   const [notify] = useNotifications()
 
   const [isLoading, setIsLoading] = useState(false)
-  const [data, setData] = useState()
+  const [data, setData] = useState({})
 
   const fetchUrl = useCallback(async (url) => {
     const renderError = (error) => {
@@ -33,7 +33,7 @@ const useFetch = (baseUrl) => {
 
   useEffect(() => {
     fetchUrl()
-  }, [baseUrl, fetchUrl])
+  }, [fetchUrl])
 
   return [data, isLoading, fetchUrl]
 }

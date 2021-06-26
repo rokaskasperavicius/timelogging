@@ -1,27 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Dropdown } from 'semantic-ui-react'
 import { Controller, useFormContext } from 'react-hook-form'
+import { map } from 'lodash'
 
-import Add from '@material-ui/icons/Add';
-
-const tasks = [
-  { key: 'English', text: 'English', value: 'English' },
-  { key: 'French', text: 'French', value: 'French' },
-  { key: 'Spanish', text: 'Spanish', value: 'Spanish' },
-  { key: 'German', text: 'German', value: 'German' },
-  { key: 'Chinese', text: 'Chinese', value: 'Chinese' },
-]
-
-const mapToOptions = (data) => data.map(value => ({
+const mapToOptions = (data) => {console.log(data); return ( map(data, value => ({
   key: value,
   text: value,
   value,
-}))
+})))}
 
 const DateField = ({
   name,
   rules,
-  options: defaultOptions = [],
+  options: defaultOptions,
 }) => {
   const { control } = useFormContext()
 
