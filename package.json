@@ -11,8 +11,7 @@
     "client": "cd client && npm start",
     "dev": "concurrently \"npm run start\" \"npm run client\"",
     "heroku-postbuild": "cd client && npm install && npm run build",
-    "prepare": "husky install",
-    "prettier": "prettier --write client/src/index.js"
+    "prepare": "husky install"
   },
   "author": "Rokas Kasperavicius",
   "license": "ISC",
@@ -30,6 +29,6 @@
     "prettier": "2.3.2"
   },
   "lint-staged": {
-    "*.{js,css,md}": "prettier --write client/src/index.js"
+    "*.{js,css,md}": "prettier --write"
   }
 }
