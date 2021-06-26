@@ -42,60 +42,110 @@ const useStyles = makeStyles((theme) => ({
   tableHeadCell: {
     border: 'unset',
   },
-}));
+}))
 
-const CalendarTable = ({
-  calendar,
-  isLoading,
-  page,
-  pageCount,
-}) => {
+const CalendarTable = ({ calendar, isLoading, page, pageCount }) => {
   const classes = useStyles()
 
   const sortedCalendar = groupBy(concat(...Object.values(calendar)), (values) =>
-    format(new Date(values.startDate), 'yyyy MMMM dd'))
-  
+    format(new Date(values.startDate), 'yyyy MMMM dd')
+  )
+
   return (
-    <TableWrapper
-      isTableEmpty={!isLoading && pageCount === 0}
-      isLoaderActive
-    >
-      <Table stickyHeader size='small'>
+    <TableWrapper isTableEmpty={!isLoading && pageCount === 0} isLoaderActive>
+      <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
-            <TableCell className={classes.tableHeadCell} size='medium'>Task</TableCell>
-            <TableCell style={{ borderBottomColor: '#303030' }} size='medium'>Time spent</TableCell>
-            <TableCell style={{ borderBottomColor: '#303030' }} size='medium'>Time range</TableCell>
-            <TableCell style={{ borderBottomColor: '#303030', maxWidth: '100px' }} size='medium'>Task description</TableCell>
-            <TableCell style={{ borderBottomColor: '#303030' }} size='medium'>Task status</TableCell>
-            <TableCell style={{ borderBottomColor: '#303030' }} colSpan={2} size='medium' align='center'>Actions</TableCell>
+            <TableCell className={classes.tableHeadCell} size="medium">
+              Task
+            </TableCell>
+            <TableCell style={{ borderBottomColor: '#303030' }} size="medium">
+              Time spent
+            </TableCell>
+            <TableCell style={{ borderBottomColor: '#303030' }} size="medium">
+              Time range
+            </TableCell>
+            <TableCell
+              style={{ borderBottomColor: '#303030', maxWidth: '100px' }}
+              size="medium"
+            >
+              Task description
+            </TableCell>
+            <TableCell style={{ borderBottomColor: '#303030' }} size="medium">
+              Task status
+            </TableCell>
+            <TableCell
+              style={{ borderBottomColor: '#303030' }}
+              colSpan={2}
+              size="medium"
+              align="center"
+            >
+              Actions
+            </TableCell>
           </TableRow>
         </TableHead>
         {map(sortedCalendar, (date, logDate) => (
           <React.Fragment>
             <TableHead>
               <TableRow>
-                <TableCell colSpan={7} style={{ top: '51px' }} size='medium'>{logDate}</TableCell>
+                <TableCell colSpan={7} style={{ top: '51px' }} size="medium">
+                  {logDate}
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {date.map((values, index) => (
                 <TableRow>
                   <TableCell>{values.task}</TableCell>
-                  <TableCell>{differenceInHours(new Date(values.endDate), new Date(values.startDate))}h {differenceInMinutes(new Date(values.endDate), new Date(values.startDate)) - (60 * differenceInHours(new Date(values.endDate), new Date(values.startDate)))}m</TableCell>
-                  <TableCell>{`(${format(new Date(values.startDate), 'HH.mm')}`} &ndash; {format(new Date(values.endDate), 'HH.mm')})</TableCell>
-                  <TableCell style={{ maxWidth: '100px' }}>{values.description}</TableCell>
-                  <TableCell>{values.isLogged ? 'Logged' : 'Not logged'}</TableCell>
+                  <TableCell>
+                    {differenceInHours(
+                      new Date(values.endDate),
+                      new Date(values.startDate)
+                    )}
+                    h{' '}
+                    {differenceInMinutes(
+                      new Date(values.endDate),
+                      new Date(values.startDate)
+                    ) -
+                      60 *
+                        differenceInHours(
+                          new Date(values.endDate),
+                          new Date(values.startDate)
+                        )}
+                    m
+                  </TableCell>
+                  <TableCell>
+                    {`(${format(new Date(values.startDate), 'HH.mm')}`} &ndash;{' '}
+                    {format(new Date(values.endDate), 'HH.mm')})
+                  </TableCell>
+                  <TableCell style={{ maxWidth: '100px' }}>
+                    {values.description}
+                  </TableCell>
+                  <TableCell>
+                    {values.isLogged ? 'Logged' : 'Not logged'}
+                  </TableCell>
                   <TableCell style={{ width: '10px' }}>
-                    <Tooltip classes={{ tooltip: classes.tooltip }} title='Edit' placement="top" TransitionComponent={Zoom} arrow>
-                      <IconButton color='primary'>
+                    <Tooltip
+                      classes={{ tooltip: classes.tooltip }}
+                      title="Edit"
+                      placement="top"
+                      TransitionComponent={Zoom}
+                      arrow
+                    >
+                      <IconButton color="primary">
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
                   </TableCell>
                   <TableCell style={{ width: '10px' }}>
-                    <Tooltip classes={{ tooltip: classes.tooltip }} title='Delete' placement="top" TransitionComponent={Zoom} arrow>
-                      <IconButton color='secondary'>
+                    <Tooltip
+                      classes={{ tooltip: classes.tooltip }}
+                      title="Delete"
+                      placement="top"
+                      TransitionComponent={Zoom}
+                      arrow
+                    >
+                      <IconButton color="secondary">
                         <DeleteIcon />
                       </IconButton>
                     </Tooltip>

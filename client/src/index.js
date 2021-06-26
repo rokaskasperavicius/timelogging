@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom'
 import { Calendar } from './Calendar'
 import reportWebVitals from './reportWebVitals'
 
-import cyan from "@material-ui/core/colors/cyan"
-import { createMuiTheme } from "@material-ui/core"
-import { ThemeProvider } from "@material-ui/styles"
+import cyan from '@material-ui/core/colors/cyan'
+import { createMuiTheme } from '@material-ui/core'
+import { ThemeProvider } from '@material-ui/styles'
 
 import { SnackbarProvider } from 'notistack'
 
@@ -16,7 +16,7 @@ import {
   Switch,
   Route,
   Redirect,
-} from "react-router-dom"
+} from 'react-router-dom'
 
 import 'semantic-ui-css/semantic.min.css'
 import 'styles/main.scss'
@@ -28,7 +28,7 @@ const darkTheme = createMuiTheme({
       main: cyan['A200'],
     },
   },
-});
+})
 
 ReactDOM.render(
   <ThemeProvider theme={darkTheme}>
@@ -42,7 +42,7 @@ ReactDOM.render(
       <ModalProvider>
         <Router>
           <Switch>
-            <Route path='/calendar'>   
+            <Route path="/calendar">
               <Calendar />
             </Route>
             <Redirect
@@ -54,12 +54,11 @@ ReactDOM.render(
         </Router>
       </ModalProvider>
     </SnackbarProvider>
-  </ThemeProvider>
-  ,
+  </ThemeProvider>,
   document.getElementById('root')
-);
+)
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+reportWebVitals()
