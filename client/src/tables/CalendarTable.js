@@ -19,7 +19,7 @@ import {
 } from '@material-ui/core'
 import { format, differenceInHours, differenceInMinutes } from 'date-fns'
 
-import TableWrapper from 'tables'
+import TableWrapper from 'tables';
 
 const useStyles = makeStyles((theme) => ({
   modal: {

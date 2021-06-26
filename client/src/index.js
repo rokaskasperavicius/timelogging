@@ -9,7 +9,7 @@ import { ThemeProvider } from '@material-ui/styles'
 
 import { SnackbarProvider } from 'notistack'
 
-import { ModalProvider } from 'context'
+import { ModalProvider } from 'context';
 
 import {
   BrowserRouter as Router,
