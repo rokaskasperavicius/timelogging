@@ -1,15 +1,11 @@
-import React from 'react'
-import DateFnsUtils from '@date-io/date-fns';
+import { useRef } from 'react'
+import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers'
 import { Controller, useFormContext } from 'react-hook-form'
 
-const DateField = ({
-  name,
-  rules,
-  views,
-  style,
-}) => {
+const DateField = ({ name, label, rules, views, style }) => {
   const { control } = useFormContext()
+  const inputRef = useRef(null)
 
   return (
     <Controller
@@ -21,9 +17,16 @@ const DateField = ({
           <DatePicker
             // error
             // helperText='KYS'
+            inputRef={inputRef}
+            inputVariant='outlined'
             style={style}
+            label={label}
             value={value}
             views={views}
+            clearable
+            onClose={() => {
+              // setTimeout(() => inputRef.current.blur(), 0)
+            }}
             autoOk={true}
             okLabel=''
             onChange={onChange}

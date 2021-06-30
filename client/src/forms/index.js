@@ -1,1 +1,1 @@
-export { default as LogTimeForm } from './LogTimeForm'
+export { LogTimeForm } from './LogTimeForm'

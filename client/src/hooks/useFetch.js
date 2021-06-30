@@ -1,35 +1,38 @@
 import { useEffect, useState, useCallback } from 'react'
 
-import { useNotifications } from 'hooks';
+import { useNotifications } from 'hooks'
 
 const useFetch = (baseUrl) => {
   const [notify] = useNotifications()
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [data, setData] = useState({})
+  const [isLoading, setIsLoading] = useState(true)
+  const [data, setData] = useState([])
 
-  const fetchUrl = useCallback(async (url) => {
-    const renderError = (error) => {
-      notify('error', error)
-    }
-
-    setIsLoading(true)
-
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    const response = await fetch(url || baseUrl)
-    const result = await response.json().catch(() => renderError())
-
-    if (response.status === 200) {
-      setData(result)
-    } else {
-      if (result) {
-        renderError(result.error)
+  const fetchUrl = useCallback(
+    async (url) => {
+      const renderError = (error) => {
+        notify('error', error)
       }
-    }
 
-    setIsLoading(false)
-  }, [baseUrl, notify])
+      setIsLoading(true)
+
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      const response = await fetch(url || baseUrl)
+      const result = await response.json().catch(() => renderError())
+
+      if (response.status === 200) {
+        setData(result)
+      } else {
+        if (result) {
+          renderError(result.error)
+        }
+      }
+
+      setIsLoading(false)
+    },
+    [baseUrl, notify]
+  )
 
   useEffect(() => {
     fetchUrl()

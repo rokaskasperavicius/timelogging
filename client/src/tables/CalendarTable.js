@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 
@@ -19,7 +19,7 @@ import {
 } from '@material-ui/core'
 import { format, differenceInHours, differenceInMinutes } from 'date-fns'
 
-import TableWrapper from 'tables';
+import { TableWrapper } from 'tables'
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -33,18 +33,16 @@ const useStyles = makeStyles((theme) => ({
     // boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
     outline: 0,
-    borderRadius: '4px',
+    borderRadius: '0px',
     color: theme.palette.text.primary,
   },
   tooltip: {
     fontSize: '13px',
   },
-  tableHeadCell: {
-    border: 'unset',
-  },
+  tableHeadCell: {},
 }))
 
-const CalendarTable = ({ calendar, isLoading, page, pageCount }) => {
+export const CalendarTable = ({ calendar, isLoading, pageCount, setPage }) => {
   const classes = useStyles()
 
   const sortedCalendar = groupBy(concat(...Object.values(calendar)), (values) =>
@@ -52,34 +50,24 @@ const CalendarTable = ({ calendar, isLoading, page, pageCount }) => {
   )
 
   return (
-    <TableWrapper isTableEmpty={!isLoading && pageCount === 0} isLoaderActive>
-      <Table stickyHeader size="small">
-        <TableHead>
+    <TableWrapper
+      isTableEmpty={!isLoading && pageCount === 0}
+      isLoaderActive={isLoading}
+      setPage={setPage}
+    >
+      <Table stickyHeader size='small'>
+        <TableHead id='test123'>
           <TableRow>
-            <TableCell className={classes.tableHeadCell} size="medium">
+            <TableCell className={classes.tableHeadCell} size='medium'>
               Task
             </TableCell>
-            <TableCell style={{ borderBottomColor: '#303030' }} size="medium">
-              Time spent
-            </TableCell>
-            <TableCell style={{ borderBottomColor: '#303030' }} size="medium">
-              Time range
-            </TableCell>
-            <TableCell
-              style={{ borderBottomColor: '#303030', maxWidth: '100px' }}
-              size="medium"
-            >
+            <TableCell size='medium'>Time spent</TableCell>
+            <TableCell size='medium'>Time range</TableCell>
+            <TableCell style={{ maxWidth: '100px' }} size='medium'>
               Task description
             </TableCell>
-            <TableCell style={{ borderBottomColor: '#303030' }} size="medium">
-              Task status
-            </TableCell>
-            <TableCell
-              style={{ borderBottomColor: '#303030' }}
-              colSpan={2}
-              size="medium"
-              align="center"
-            >
+            <TableCell size='medium'>Task status</TableCell>
+            <TableCell colSpan={2} size='medium' align='center'>
               Actions
             </TableCell>
           </TableRow>
@@ -88,7 +76,14 @@ const CalendarTable = ({ calendar, isLoading, page, pageCount }) => {
           <React.Fragment>
             <TableHead>
               <TableRow>
-                <TableCell colSpan={7} style={{ top: '51px' }} size="medium">
+                <TableCell
+                  colSpan={7}
+                  style={{
+                    top: document.getElementsByClassName('MuiTableHead-root')[0]
+                      .offsetHeight,
+                  }}
+                  size='medium'
+                >
                   {logDate}
                 </TableCell>
               </TableRow>
@@ -127,12 +122,12 @@ const CalendarTable = ({ calendar, isLoading, page, pageCount }) => {
                   <TableCell style={{ width: '10px' }}>
                     <Tooltip
                       classes={{ tooltip: classes.tooltip }}
-                      title="Edit"
-                      placement="top"
+                      title='Edit'
+                      placement='top'
                       TransitionComponent={Zoom}
                       arrow
                     >
-                      <IconButton color="primary">
+                      <IconButton color='primary'>
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
@@ -140,12 +135,12 @@ const CalendarTable = ({ calendar, isLoading, page, pageCount }) => {
                   <TableCell style={{ width: '10px' }}>
                     <Tooltip
                       classes={{ tooltip: classes.tooltip }}
-                      title="Delete"
-                      placement="top"
+                      title='Delete'
+                      placement='top'
                       TransitionComponent={Zoom}
                       arrow
                     >
-                      <IconButton color="secondary">
+                      <IconButton color='secondary'>
                         <DeleteIcon />
                       </IconButton>
                     </Tooltip>
@@ -159,5 +154,3 @@ const CalendarTable = ({ calendar, isLoading, page, pageCount }) => {
     </TableWrapper>
   )
 }
-
-export default CalendarTable

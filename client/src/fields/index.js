@@ -1,5 +1,5 @@
 export { default as DateTimeField } from './DateTimeField'
 export { default as DateField } from './DateField'
-export { default as DropdownField } from './DropdownField'
+export { DropdownField } from './DropdownField'
 export { default as InputField } from './InputField'
 export { default as CheckboxField } from './CheckboxField'

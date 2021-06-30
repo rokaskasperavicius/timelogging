@@ -1,15 +1,12 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { isEmpty } from 'lodash'
 
 import { useFetch } from 'hooks'
 
-
-const usePaginator = (url) => {
+export const usePaginator = (url) => {
   const [page, setPage] = useState(0)
   const [pageCount, setPageCount] = useState(0)
-  const [pages, setPages] = useState()
-
-  console.log({ page, pageCount, pages })
+  const [pages, setPages] = useState([])
 
   const [response, isLoading, fetchUrl] = useFetch(url + `&page=${page}`)
 
@@ -18,8 +15,8 @@ const usePaginator = (url) => {
       const { data, page, pages } = response
 
       setPageCount(pages)
-      
-      setPages(p => ({
+
+      setPages((p) => ({
         ...p,
         [page]: data,
       }))
@@ -27,9 +24,11 @@ const usePaginator = (url) => {
   }, [response])
 
   const resetPaginator = () => {
-    setPages(undefined)
+    setPages([])
     setPageCount(0)
     setPage(0)
+
+    fetchUrl()
   }
 
   return [
@@ -44,5 +43,3 @@ const usePaginator = (url) => {
     fetchUrl,
   ]
 }
-
-export default usePaginator

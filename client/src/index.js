@@ -3,13 +3,12 @@ import ReactDOM from 'react-dom'
 import { Calendar } from './Calendar'
 import reportWebVitals from './reportWebVitals'
 
-import cyan from '@material-ui/core/colors/cyan'
 import { createMuiTheme } from '@material-ui/core'
 import { ThemeProvider } from '@material-ui/styles'
 
 import { SnackbarProvider } from 'notistack'
 
-import { ModalProvider } from 'context';
+import { ModalProvider } from 'context'
 
 import {
   BrowserRouter as Router,
@@ -25,7 +24,7 @@ const darkTheme = createMuiTheme({
   palette: {
     type: 'dark',
     primary: {
-      main: cyan['A200'],
+      main: '#0091ea',
     },
   },
 })
@@ -39,10 +38,10 @@ ReactDOM.render(
         horizontal: 'center',
       }}
     >
-      <ModalProvider>
-        <Router>
+      <Router>
+        <ModalProvider>
           <Switch>
-            <Route path="/calendar">
+            <Route path='/calendar'>
               <Calendar />
             </Route>
             <Redirect
@@ -51,8 +50,8 @@ ReactDOM.render(
               }}
             />
           </Switch>
-        </Router>
-      </ModalProvider>
+        </ModalProvider>
+      </Router>
     </SnackbarProvider>
   </ThemeProvider>,
   document.getElementById('root')
