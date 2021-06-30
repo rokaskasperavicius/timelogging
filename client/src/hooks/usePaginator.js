@@ -1,33 +1,45 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
+import { isEmpty } from 'lodash'
 
 import { useFetch } from 'hooks'
 
-
-const usePaginator = (url) => {
-  const [pages, setPages] = useState()
+export const usePaginator = (url) => {
+  const [page, setPage] = useState(0)
   const [pageCount, setPageCount] = useState(0)
+  const [pages, setPages] = useState([])
 
-  const [data, isLoading, fetchUrl] = useFetch(url)
+  const [response, isLoading, fetchUrl] = useFetch(url + `&page=${page}`)
 
-  console.log(data, pages)
   useEffect(() => {
-    if (data) {
-      const { calendar, page, pages } = data
+    if (!isEmpty(response)) {
+      const { data, page, pages } = response
 
       setPageCount(pages)
-      
-      setPages(p => ({
+
+      setPages((p) => ({
         ...p,
-        [page]: calendar,
+        [page]: data,
       }))
     }
-  }, [data])
+  }, [response])
 
-  const clearPages = () => {
-    setPages(undefined)
+  const resetPaginator = () => {
+    setPages([])
+    setPageCount(0)
+    setPage(0)
+
+    fetchUrl()
   }
 
-  return [pages, pageCount, isLoading, clearPages, fetchUrl]
+  return [
+    pages,
+    {
+      page,
+      pageCount,
+      setPage,
+    },
+    isLoading,
+    resetPaginator,
+    fetchUrl,
+  ]
 }
-
-export default usePaginator

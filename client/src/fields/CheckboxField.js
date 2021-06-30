@@ -1,11 +1,8 @@
-import React from 'react';
-import Checkbox from '@material-ui/core/Checkbox';
+import React from 'react'
+import { Checkbox, FormControlLabel } from '@material-ui/core'
 import { Controller, useFormContext } from 'react-hook-form'
 
-const DateField = ({
-  name,
-  rules,
-}) => {
+const DateField = ({ name, rules, label }) => {
   const { control } = useFormContext()
 
   return (
@@ -14,10 +11,15 @@ const DateField = ({
       control={control}
       rules={rules}
       render={({ value, onChange }) => (
-        <Checkbox
-          checked={value}
-          color='primary'
-          onChange={e => onChange(e.target.checked)}
+        <FormControlLabel
+          label={label}
+          control={
+            <Checkbox
+              checked={value}
+              color='primary'
+              onChange={(e) => onChange(e.target.checked)}
+            />
+          }
         />
       )}
     />

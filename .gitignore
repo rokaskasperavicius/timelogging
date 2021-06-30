@@ -10,7 +10,8 @@
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -74,6 +75,7 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+build/
 
 # TypeScript v1 declaration files
 typings/

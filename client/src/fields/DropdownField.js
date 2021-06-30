@@ -1,61 +1,78 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Dropdown } from 'semantic-ui-react'
 import { Controller, useFormContext } from 'react-hook-form'
+import { map, find, isEmpty } from 'lodash'
+import TextField from '@material-ui/core/TextField'
+import Autocomplete, {
+  createFilterOptions,
+} from '@material-ui/lab/Autocomplete'
+const filter = createFilterOptions()
 
-import Add from '@material-ui/icons/Add';
+const mapToOptions = (data) =>
+  map(data, (value) => ({
+    key: value,
+    text: value,
+  }))
 
-const tasks = [
-  { key: 'English', text: 'English', value: 'English' },
-  { key: 'French', text: 'French', value: 'French' },
-  { key: 'Spanish', text: 'Spanish', value: 'Spanish' },
-  { key: 'German', text: 'German', value: 'German' },
-  { key: 'Chinese', text: 'Chinese', value: 'Chinese' },
-]
-
-const mapToOptions = (data) => data.map(value => ({
-  key: value,
-  text: value,
-  value,
-}))
-
-const DateField = ({
-  name,
-  rules,
-  options: defaultOptions = [],
-}) => {
+export const DropdownField = ({ name, label, rules, options }) => {
   const { control } = useFormContext()
-
-  const [options, setOptions] = useState([])
-
-  useEffect(() => {
-    setOptions(mapToOptions(defaultOptions))
-  }, [defaultOptions])
-
-  const handleAddition = (e, { value }) => {
-    setOptions([{ text: value, key: value, value }, ...options])
-  }
 
   return (
     <Controller
       name={name}
       control={control}
       rules={rules}
-      render={({ value, onChange }) => { return (
-        <Dropdown
-          options={options}
-          placeholder='Choose Task ID'
-          search
-          selection
-          fluid
-          allowAdditions
-          additionLabel='New task '
-          value={value}
-          onAddItem={handleAddition}
-          onChange={(e, { value }) => onChange(value)}
-        />
-      )}}
+      render={({ value, onChange }) => {
+        return (
+          <Autocomplete
+            value={value}
+            onChange={(event, newValue) => {
+              if (newValue && newValue.key) {
+                onChange(newValue.key)
+              } else {
+                onChange(newValue)
+              }
+            }}
+            filterOptions={(options, params) => {
+              const filtered = filter(options, params)
+
+              // Suggest the creation of a new value
+              if (
+                params.inputValue !== '' &&
+                !find(
+                  options,
+                  ({ text }) =>
+                    text.toLowerCase() === params.inputValue.toLowerCase()
+                )
+              ) {
+                filtered.push({
+                  key: params.inputValue,
+                  text: `Add "${params.inputValue}"`,
+                })
+              }
+
+              return filtered
+            }}
+            selectOnFocus
+            clearOnBlur
+            handleHomeEndKeys
+            options={mapToOptions(options)}
+            getOptionLabel={(option) => {
+              // Value selected with enter, right from the input
+              if (typeof option === 'string') {
+                return option
+              }
+
+              // Regular option
+              return option.text
+            }}
+            freeSolo
+            renderInput={(params) => (
+              <TextField {...params} label={label} variant='outlined' />
+            )}
+          />
+        )
+      }}
     />
   )
 }
-
-export default DateField

@@ -1,18 +1,19 @@
-import React from 'react'
-import DateFnsUtils from '@date-io/date-fns';
+import { useRef } from 'react'
+import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, DateTimePicker } from '@material-ui/pickers'
 import { Controller, useFormContext } from 'react-hook-form'
 
-const DateTimeField = ({
-  name,
-  rules,
-  onChange: onChangeCustom,
-}) => {
+const DateTimeField = ({ name, rules, label, onChange: onChangeCustom }) => {
+  const inputRef = useRef(null)
+
   const { control } = useFormContext()
-  const initialFocusedDate = new Date(Math.floor(new Date().getTime() / (1000 * 60 * 5)) * 1000 * 60 * 5) // Rounds to nearest 5 minutes
+  const initialFocusedDate = new Date(
+    Math.floor(new Date().getTime() / (1000 * 60 * 5)) * 1000 * 60 * 5
+  ) // Rounds to nearest 5 minutes
 
   return (
     <Controller
+      id={name}
       name={name}
       control={control}
       rules={rules}
@@ -22,6 +23,7 @@ const DateTimeField = ({
             // error
             // helperText='KYS'
             value={value}
+            inputVariant='outlined'
             onChange={(value) => {
               onChange(value)
 
@@ -29,10 +31,16 @@ const DateTimeField = ({
                 onChangeCustom()
               }
             }}
+            onClose={() => {
+              // setTimeout(() => inputRef.current.blur(), 0)
+            }}
+            inputRef={inputRef}
             minutesStep={5}
             autoOk={true}
+            clearable
             okLabel=''
-            format={'y LLL d, HH:mm'}
+            label={label}
+            format={'y MMMM d, HH:mm'}
             // emptyLabel={'NNANANA'}
             ampm={false}
             initialFocusedDate={initialFocusedDate}

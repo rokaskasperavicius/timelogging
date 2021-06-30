@@ -1,23 +1,18 @@
-import TextField from '@material-ui/core/TextField';
 import { useFormContext } from 'react-hook-form'
+import { FormControl, TextField, InputLabel } from '@material-ui/core'
 
-const InputField = ({
-  name,
-  rules,
-  multiline = false,
-}) => {
+const InputField = ({ name, rules, label, multiline = false }) => {
   const { register } = useFormContext()
 
   return (
     <TextField
       inputRef={register(rules)}
       name={name}
-      label="Multiline"
+      label={label}
       multiline={multiline}
-      rows={4}
-      variant="outlined"
+      rows={2}
+      variant='outlined'
     />
-    // <input name={name} ref={register} />
   )
 }
 
