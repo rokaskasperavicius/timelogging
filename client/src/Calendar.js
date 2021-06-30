@@ -28,7 +28,13 @@ export const Calendar = () => {
 
   const {
     year = new Date().getFullYear(),
-    month = format(new Date(), 'MMMM'),
+    month = format(
+      new Date(
+        new Date().getFullYear(),
+        new Date().getMonth() + (new Date().getDate() >= 20 ? 1 : 0)
+      ),
+      'MMMM'
+    ), //new Date().getDate() >= 20, // Should probably open next month after 20th day
   } = queryString.parse(search)
 
   const [calendar, { page, pageCount, setPage }, isLoading, resetPaginator] =

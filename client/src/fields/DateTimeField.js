@@ -3,7 +3,13 @@ import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, DateTimePicker } from '@material-ui/pickers'
 import { Controller, useFormContext } from 'react-hook-form'
 
-const DateTimeField = ({ name, rules, label, onChange: onChangeCustom }) => {
+const DateTimeField = ({
+  name,
+  rules,
+  label,
+  onChange: onChangeCustom,
+  openTo,
+}) => {
   const inputRef = useRef(null)
 
   const { control } = useFormContext()
@@ -22,6 +28,7 @@ const DateTimeField = ({ name, rules, label, onChange: onChangeCustom }) => {
           <DateTimePicker
             // error
             // helperText='KYS'
+            openTo={openTo}
             value={value}
             inputVariant='outlined'
             onChange={(value) => {

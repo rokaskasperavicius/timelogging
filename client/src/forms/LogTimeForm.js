@@ -63,6 +63,10 @@ export const LogTimeForm = ({ year, month, resetPaginator }) => {
 
       setValue('logDate', new Date(year, month))
     }
+
+    if (startDate && !endDate) {
+      setValue('endDate', startDate)
+    }
   }
 
   const onSubmit = (data) => {
@@ -88,6 +92,7 @@ export const LogTimeForm = ({ year, month, resetPaginator }) => {
         />
         <DateTimeField
           label='Task end time'
+          openTo='hours'
           name='endDate'
           onChange={handleDateChange}
           rules={{
