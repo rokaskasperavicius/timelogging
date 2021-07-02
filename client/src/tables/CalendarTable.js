@@ -42,7 +42,14 @@ const useStyles = makeStyles((theme) => ({
   tableHeadCell: {},
 }))
 
-export const CalendarTable = ({ calendar, isLoading, pageCount, setPage }) => {
+export const CalendarTable = ({
+  calendar,
+  isLoading,
+  isTableEmpty,
+  enableInfinityLoading,
+  isLastPage,
+  setPage,
+}) => {
   const classes = useStyles()
 
   const sortedCalendar = groupBy(concat(...Object.values(calendar)), (values) =>
@@ -51,12 +58,14 @@ export const CalendarTable = ({ calendar, isLoading, pageCount, setPage }) => {
 
   return (
     <TableWrapper
-      isTableEmpty={!isLoading && pageCount === 0}
-      isLoaderActive={isLoading}
+      isTableEmpty={isTableEmpty}
+      isLoading={isLoading}
+      enableInfinityLoading={enableInfinityLoading}
+      isLastPage={isLastPage}
       setPage={setPage}
     >
       <Table stickyHeader size='small'>
-        <TableHead id='test123'>
+        <TableHead>
           <TableRow>
             <TableCell className={classes.tableHeadCell} size='medium'>
               Task
@@ -79,8 +88,7 @@ export const CalendarTable = ({ calendar, isLoading, pageCount, setPage }) => {
                 <TableCell
                   colSpan={7}
                   style={{
-                    top: document.getElementsByClassName('MuiTableHead-root')[0]
-                      .offsetHeight,
+                    top: '54px',
                   }}
                   size='medium'
                 >

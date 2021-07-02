@@ -1,7 +1,8 @@
 import { Button, makeStyles } from '@material-ui/core'
 import { FormProvider, useForm } from 'react-hook-form'
 import { format } from 'date-fns'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
+import { omit } from 'lodash'
 
 import {
   DateTimeField,
@@ -24,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export const LogTimeForm = ({ year, month, resetPaginator }) => {
+export const LogTimeForm = ({ year, month, resetPaginator, fetchUrl }) => {
   const methods = useForm({
     defaultValues: {
       startDate: null,
@@ -44,6 +45,7 @@ export const LogTimeForm = ({ year, month, resetPaginator }) => {
     onSuccess: ({ year: logYear, month: logMonth }) => {
       if (logYear === year && logMonth === month) {
         resetPaginator()
+        fetchUrl()
       } else {
         history.push(`/calendar?year=${logYear}&month=${logMonth}`)
       }
@@ -71,7 +73,7 @@ export const LogTimeForm = ({ year, month, resetPaginator }) => {
 
   const onSubmit = (data) => {
     sendData({
-      ...data,
+      ...omit(data, ['logDate']),
       year: format(data.logDate, 'y'),
       month: format(data.logDate, 'LLLL'),
       createdAt: new Date(),

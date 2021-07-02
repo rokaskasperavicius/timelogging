@@ -27,8 +27,6 @@ export const usePaginator = (url) => {
     setPages([])
     setPageCount(0)
     setPage(0)
-
-    fetchUrl()
   }
 
   return [
