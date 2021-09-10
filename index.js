@@ -3,6 +3,9 @@ const path = require('path')
 
 const apiRouter = require('./routes/api')
 
+const ical = require('node-ical')
+const test = require('./cal.ics')
+
 const app = express()
 app.use(express.json())
 // app.use(express.urlencoded({ extended: false }));
@@ -19,5 +22,8 @@ app.get('*', (req, res) => {
 
 const port = process.env.PORT || 5000
 app.listen(port)
+
+const events = ical.sync.parseFile(test)
+console.log(events)
 
 console.log(`Listening on ${port}`)

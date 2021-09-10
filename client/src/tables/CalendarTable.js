@@ -48,6 +48,7 @@ export const CalendarTable = ({
   isTableEmpty,
   enableInfinityLoading,
   isLastPage,
+  pageCount,
   setPage,
 }) => {
   const classes = useStyles()
@@ -62,6 +63,7 @@ export const CalendarTable = ({
       isLoading={isLoading}
       enableInfinityLoading={enableInfinityLoading}
       isLastPage={isLastPage}
+      pageCount={pageCount}
       setPage={setPage}
     >
       <Table stickyHeader size='small'>

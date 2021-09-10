@@ -1,7 +1,9 @@
+import cal from './cal.ics'
 import { useLocation, useHistory } from 'react-router-dom'
 import queryString from 'query-string'
 import { format, add } from 'date-fns'
 import { upperFirst, isEmpty } from 'lodash'
+import { useEffect } from 'react'
 
 // Material UI
 import { makeStyles, Button } from '@material-ui/core'
@@ -13,6 +15,18 @@ import { CalendarTable } from 'tables'
 import { LogTimeForm } from 'forms'
 import { usePaginator } from 'hooks'
 import { useModalContext } from 'context'
+
+import icsToJson from 'ics-to-json'
+// const ical = require('ical');
+const ical = require('node-ical')
+
+const convert = async (fileLocation) => {
+  const icsRes = await fetch(fileLocation)
+  const icsData = await icsRes.text()
+  // Convert
+  const data = icsToJson(icsData)
+  return data
+}
 
 const useStyles = makeStyles((theme) => ({
   calendarRoot: {
@@ -33,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const Calendar = () => {
+  // console.log(format)
   const { search } = useLocation()
   const history = useHistory()
   const classes = useStyles()
@@ -70,6 +85,15 @@ export const Calendar = () => {
     })
   }
 
+  useEffect(() => {
+    // console.log(convert('http://calendar.google.com/calendar/ical/h24iin6tj57esmfv8qtj4d8nn9ek4h8l%40import.calendar.google.com/public/basic.ics'))
+    // fetch('http://ical-to-json.herokuapp.com/convert?url=https://calendar.google.com/calendar/ical/h24iin6tj57esmfv8qtj4d8nn9ek4h8l%40import.calendar.google.com/public/basic.ics')
+    //   .then(res => res.json())
+    //   .then(data => console.log(data))
+    // const events = ical.sync.parseFile(cal);
+    // console.log(events)
+  }, [])
+
   const handleMonthChange = (monthCount) => {
     resetPaginator()
 
@@ -84,6 +108,8 @@ export const Calendar = () => {
     //   body: JSON.stringify({ message: 'HIII' }),
     // })
   }
+
+  console.log(Object.values(calendar).length)
 
   return (
     <div className={classes.calendarRoot}>
@@ -119,7 +145,8 @@ export const Calendar = () => {
         enableInfinityLoading={true}
         calendar={calendar}
         isTableEmpty={!isLoading && pageCount === 0}
-        isLastPage={page + 1 === pageCount}
+        isLastPage={Object.values(calendar).length >= pageCount}
+        pageCount={pageCount}
         isLoading={isLoading}
         setPage={setPage}
       />
