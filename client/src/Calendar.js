@@ -1,4 +1,3 @@
-import cal from './cal.ics'
 import { useLocation, useHistory } from 'react-router-dom'
 import queryString from 'query-string'
 import { format, add } from 'date-fns'
@@ -15,18 +14,6 @@ import { CalendarTable } from 'tables'
 import { LogTimeForm } from 'forms'
 import { usePaginator } from 'hooks'
 import { useModalContext } from 'context'
-
-import icsToJson from 'ics-to-json'
-// const ical = require('ical');
-const ical = require('node-ical')
-
-const convert = async (fileLocation) => {
-  const icsRes = await fetch(fileLocation)
-  const icsData = await icsRes.text()
-  // Convert
-  const data = icsToJson(icsData)
-  return data
-}
 
 const useStyles = makeStyles((theme) => ({
   calendarRoot: {
@@ -85,15 +72,6 @@ export const Calendar = () => {
     })
   }
 
-  useEffect(() => {
-    // console.log(convert('http://calendar.google.com/calendar/ical/h24iin6tj57esmfv8qtj4d8nn9ek4h8l%40import.calendar.google.com/public/basic.ics'))
-    // fetch('http://ical-to-json.herokuapp.com/convert?url=https://calendar.google.com/calendar/ical/h24iin6tj57esmfv8qtj4d8nn9ek4h8l%40import.calendar.google.com/public/basic.ics')
-    //   .then(res => res.json())
-    //   .then(data => console.log(data))
-    // const events = ical.sync.parseFile(cal);
-    // console.log(events)
-  }, [])
-
   const handleMonthChange = (monthCount) => {
     resetPaginator()
 
@@ -101,12 +79,6 @@ export const Calendar = () => {
     history.push(
       `/calendar?year=${newDate.getFullYear()}&month=${format(newDate, 'MMMM')}`
     )
-
-    // fetch('https://prod-97.westeurope.logic.azure.com:443/workflows/f76a9d8649ca4186a5f9b687aef07ff6/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZTVjQ-xbPjtQsZ1KHES527DHvzUnPZ6p6GoWn-suqUQ', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ message: 'HIII' }),
-    // })
   }
 
   console.log(Object.values(calendar).length)
