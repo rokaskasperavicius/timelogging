@@ -4,6 +4,8 @@ import { format, add } from 'date-fns'
 import { upperFirst, isEmpty } from 'lodash'
 import { useEffect } from 'react'
 
+import axios from 'axios'
+
 // Material UI
 import { makeStyles, Button } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
@@ -50,6 +52,24 @@ export const Calendar = () => {
       'MMMM'
     ), //new Date().getDate() >= 20, // Should probably open next month after 20th day
   } = queryString.parse(search)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await axios.post(
+        `https://ob.nordigen.com/api/v2/token/new`,
+        {
+          secret_id: 'b64511d2-e53e-45bc-995e-c6ef525c2189',
+          secret_key:
+            'bf3b152bf90e8cfe6af331f44e46f88da653aaf692a7bf62c9652db5153d324a90abb4d5c04a03eab61a6f03cd41731276ec84c1e757f931954227d7d534a482',
+        }
+      )
+
+      console.log('asdasdasd')
+      console.log(data)
+    }
+
+    fetchData()
+  }, [])
 
   const [
     calendar,

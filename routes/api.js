@@ -15,7 +15,7 @@ const pool = new Pool({
 })
 
 app.get('/calendar', async (req, res) => {
-  const { year, month, page } = req.query
+  const { year, month, page } = req.query // add default values
   const client = await pool.connect()
 
   client.query(
